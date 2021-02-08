@@ -6,8 +6,11 @@ import trio
 
 from tetris import Window
 from tetris.blocks import BLOCKS
-from tetris.exceptions import CollisionError, GameOverError, OutOfBoundsError
-
+from tetris.exceptions import (
+    CollisionError,
+    GameOverError,
+    OutOfBoundsError
+)
 
 COLORS: Dict[str, int] = {
     "I": curses.COLOR_YELLOW,
@@ -102,7 +105,7 @@ class Block:
         self.topleft = [0, GRID_WIDTH // 2 - 1]
         self.color = curses.color_pair(COLORS[self.letter])
 
-    def land(self):
+    def land(self) -> None:
         """
         Lands a tetromino. If top left corner of the tetromino
         is beyond upper boundary, raises GameOverError.
@@ -113,13 +116,11 @@ class Block:
         for rowidx, row in enumerate(self.shape):
             for colidx, _ in enumerate(row):
                 if self.shape[rowidx][colidx] != 0:
-                    y_coord, x_coord = self.topleft
-                    self.grid[rowidx + y_coord][colidx + x_coord][0] = self.shape[rowidx][
-                        colidx
-                    ]
-                    self.grid[rowidx + y_coord][colidx + x_coord][1] = self.color
+                    y, x = self.topleft
+                    self.grid[rowidx + y][colidx + x][0] = self.shape[rowidx][colidx]
+                    self.grid[rowidx + y][colidx + x][1] = self.color
 
-    def move_sideways(self, direction):
+    def move_sideways(self, direction: str) -> None:
         """
         Moves a tetromino one step left or right if another tetromino is not in
         its way, whilst making sure it does not go out of bounds at the same time.
@@ -127,20 +128,15 @@ class Block:
         for rowidx, row in enumerate(self.shape):
             for colidx, _ in enumerate(row):
                 if self.shape[rowidx][colidx] != 0:
-                    y_coord, x_coord = self.topleft
-                    if colidx + x_coord + DIRECTIONS[direction] not in range(GRID_WIDTH):
+                    y, x = self.topleft
+                    if colidx + x + DIRECTIONS[direction] not in range(GRID_WIDTH):
                         raise OutOfBoundsError
-                    if (
-                        self.grid[rowidx + y_coord][
-                            colidx + x_coord + DIRECTIONS[direction]
-                        ][0]
-                        != 0
-                    ):
+                    if self.grid[rowidx + y][colidx + x + DIRECTIONS[direction]][0] != 0:
                         raise CollisionError
 
         self.topleft[1] += DIRECTIONS[direction]
 
-    def move_down(self):
+    def move_down(self) -> None:
         """
         Moves a tetromino one step down if another tetromino is not in its way,
         whilst making sure it does not go out of bounds at the same time.
@@ -148,15 +144,15 @@ class Block:
         for rowidx, row in enumerate(self.shape):
             for colidx, _ in enumerate(row):
                 if self.shape[rowidx][colidx] != 0:
-                    y_coord, x_coord = self.topleft
-                    if rowidx + y_coord + 1 >= GRID_HEIGHT:
+                    y, x = self.topleft
+                    if rowidx + y + 1 >= GRID_HEIGHT:
                         raise OutOfBoundsError
-                    elif self.grid[rowidx + y_coord + 1][colidx + x_coord][0] != 0:
+                    elif self.grid[rowidx + y + 1][colidx + x][0] != 0:
                         raise CollisionError
 
         self.topleft[0] += 1
 
-    def move_all_the_way_down(self):
+    def move_all_the_way_down(self) -> None:
         """
         Moves a tetromino all the way down until it either goes
         out of bounds, or until another tetromino is encountered.
@@ -167,7 +163,7 @@ class Block:
             except (OutOfBoundsError, CollisionError):
                 break
 
-    def rotate(self, direction):
+    def rotate(self, direction: str) -> None:
         """
         Rotates a tetromino either left or right if another tetromino is
         not in its way, whilst making sure it does not go out of bounds.
@@ -180,12 +176,12 @@ class Block:
         for rowidx, row in enumerate(potential_shape):
             for colidx, _ in enumerate(row):
                 if potential_shape[rowidx][colidx] != 0:
-                    y_coord, x_coord = self.topleft
-                    if colidx + x_coord not in range(GRID_WIDTH):
+                    y, x = self.topleft
+                    if colidx + x not in range(GRID_WIDTH):
                         raise OutOfBoundsError
-                    if rowidx + y_coord >= GRID_HEIGHT:
+                    if rowidx + y >= GRID_HEIGHT:
                         raise OutOfBoundsError
-                    if self.grid[rowidx + y_coord][colidx + x_coord][0] != 0:
+                    if self.grid[rowidx + y][colidx + x][0] != 0:
                         raise CollisionError
 
         self.shape = potential_shape

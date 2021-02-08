@@ -1,11 +1,17 @@
 import curses
 import sys
+from typing import List, Optional
 
 import trio
 
 from tetris import Window
-from tetris.core import COLORS, GRID_HEIGHT, GRID_WIDTH
-
+from tetris.core import (
+    COLORS,
+    GRID_HEIGHT,
+    GRID_WIDTH,
+    Block,
+    Game,
+)
 
 SCREEN_WIDTH: int = GRID_WIDTH * 2
 SCREEN_HEIGHT: int = GRID_HEIGHT
@@ -35,34 +41,34 @@ class UserInterface:
         for color in COLORS.values():
             curses.init_pair(color, color, color)
 
-    def display_score(self, screen, score):
+    def display_score(self, screen: Window, score: int) -> None:  # pylint: disable=no-self-use
         """
         Displays current score at the lower left-hand side of the screen.
         """
-        y_coord = (curses.LINES - SCREEN_HEIGHT) // 2 + SCREEN_HEIGHT + 1
-        x_coord = (curses.COLS - SCREEN_WIDTH) // 2 - 1
-        screen.addstr(y_coord, x_coord, f" SCORE: {score} ", curses.A_BOLD)
+        y = (curses.LINES - SCREEN_HEIGHT) // 2 + SCREEN_HEIGHT + 1
+        x = (curses.COLS - SCREEN_WIDTH) // 2 - 1
+        screen.addstr(y, x, f" SCORE: {score} ", curses.A_BOLD)
 
-    def display_next_block(self, screen, block):
+    def display_next_block(self, screen: Window, block: Block) -> None:  # pylint: disable=no-self-use
         """
         Displays incoming block at the right-hand side of the play field.
         """
-        y_coord = (curses.LINES - SCREEN_HEIGHT) // 2
-        x_coord = (curses.COLS - SCREEN_WIDTH) // 2
+        y = (curses.LINES - SCREEN_HEIGHT) // 2
+        x = (curses.COLS - SCREEN_WIDTH) // 2
 
-        screen.addstr(y_coord, x_coord + SCREEN_WIDTH + 3, "NEXT", curses.A_BOLD)
+        screen.addstr(y, x + SCREEN_WIDTH + 3, "NEXT", curses.A_BOLD)
 
         for rowidx, row in enumerate(block.shape):
             for colidx, _ in enumerate(row):
                 if block.shape[rowidx][colidx] != 0:
                     screen.addstr(
-                        rowidx + y_coord + 2,
-                        (colidx * 2) + x_coord + SCREEN_WIDTH + 3,
+                        rowidx + y + 2,
+                        (colidx * 2) + x + SCREEN_WIDTH + 3,
                         "██",
                         block.color,
                     )
 
-    async def display_game_over_screen(self, game):
+    async def display_game_over_screen(self, game: Game) -> None:
         """
         Displays game over screen and waits for user input.
         If the input are keys "q" or "r", it quits or restarts the game, respectively.
@@ -86,40 +92,41 @@ class UserInterface:
 
 
 class Renderer:
-    def __init__(self, screen):
+    def __init__(self, screen: Window):
         self.screen = screen
 
-    def _addstr(self, y_coord, x_coord, text, color_info_stuff):
+    def _addstr(self, y: int, x: int, text: str, color_info_stuff: int) -> None:
         """
         Works around curses' limitation of drawing at bottom right corner
         of the screen, as seen on https://stackoverflow.com/q/36387625
         """
         screen_height, screen_width = self.screen.getmaxyx()
-        if x_coord + len(text) == screen_width and y_coord == screen_height - 1:
+        if x + len(text) == screen_width and y == screen_height - 1:
             try:
-                self.screen.addstr(y_coord, x_coord, text, color_info_stuff)
+                self.screen.addstr(y, x, text, color_info_stuff)
             except curses.error:
                 pass
         else:
-            self.screen.addstr(y_coord, x_coord, text, color_info_stuff)
+            self.screen.addstr(y, x, text, color_info_stuff)
 
-    def render_landed_blocks(self, grid):
+    def render_landed_blocks(self, grid: List[List[List[Optional[int]]]]) -> None:
         """
         Renders all the landed tetrominos.
         """
         for rowidx, row in enumerate(grid):
             for colidx, col in enumerate(row):
                 if grid[rowidx][colidx][0] != 0:
+                    assert col[1] is not None
                     self._addstr(rowidx, colidx * 2, "██", col[1])
 
-    def render_current_block(self, block):
+    def render_current_block(self, block: Block) -> None:
         """
         Renders a current tetromino.
         """
         for rowidx, row in enumerate(block.shape):
             for colidx, _ in enumerate(row):
                 if block.shape[rowidx][colidx] != 0:
-                    y_coord, x_coord = block.topleft
+                    y, x = block.topleft
                     self._addstr(
-                        rowidx + y_coord, (colidx + x_coord) * 2, "██", block.color
+                        rowidx + y, (colidx + x) * 2, "██", block.color
                     )
