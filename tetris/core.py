@@ -1,6 +1,6 @@
 import curses
 import random
-from typing import Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 import trio
 
@@ -11,6 +11,12 @@ from tetris.exceptions import (
     GameOverError,
     OutOfBoundsError
 )
+
+if TYPE_CHECKING:
+    from tetris.user_interface import UserInterface  # pylint: disable=cyclic-import
+else:
+    UserInterface = Any
+
 
 COLORS: Dict[str, int] = {
     "I": curses.COLOR_YELLOW,
@@ -29,7 +35,7 @@ GRID_HEIGHT: int = 16
 
 
 class Game:
-    def __init__(self, screen: Window, user_interface):
+    def __init__(self, screen: Window, user_interface: UserInterface):
         self.screen = screen
         self.user_interface = user_interface
         self.grid = [[[0, None] for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]

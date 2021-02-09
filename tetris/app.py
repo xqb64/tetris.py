@@ -1,17 +1,30 @@
 import locale
 import curses
 import sys
-from typing import Optional, Tuple
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict
+)
 
 import trio
 
 from tetris import Window
 from tetris.core import Game
 from tetris.exceptions import CollisionError, OutOfBoundsError
-from tetris.user_interface import SCREEN_HEIGHT, SCREEN_WIDTH, UserInterface
+from tetris.user_interface import (
+    UserInterface,
+    create_screens
+)
+
+if TYPE_CHECKING:
+    from tetris.core import Block
+else:
+    Block = Any
 
 
-KEY_BINDINGS = {
+KEY_BINDINGS: Dict[int, Callable[[Block], None]] = {
     curses.KEY_LEFT: lambda block: block.move_sideways("left"),
     curses.KEY_RIGHT: lambda block: block.move_sideways("right"),
     curses.KEY_DOWN: lambda block: block.move_down(),
@@ -19,25 +32,6 @@ KEY_BINDINGS = {
     ord("a"): lambda block: block.rotate("left"),
     ord("d"): lambda block: block.rotate("right"),
 }
-
-
-def create_screens(outer_screen: Window) -> Tuple[Optional[Window], Optional[Window]]:
-    if UserInterface.ensure_terminal_size():
-        border_screen = outer_screen.subwin(
-            1 + SCREEN_HEIGHT + 1,
-            1 + SCREEN_WIDTH + 1,
-            (curses.LINES - SCREEN_HEIGHT) // 2 - 1,
-            (curses.COLS - SCREEN_WIDTH) // 2 - 1,
-        )
-        inner_screen = border_screen.subwin(
-            SCREEN_HEIGHT,
-            SCREEN_WIDTH,
-            (curses.LINES - SCREEN_HEIGHT) // 2,
-            (curses.COLS - SCREEN_WIDTH) // 2,
-        )
-    else:
-        return None, None
-    return border_screen, inner_screen
 
 
 def sync_main() -> None:

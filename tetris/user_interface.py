@@ -1,6 +1,6 @@
 import curses
 import sys
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import trio
 
@@ -130,3 +130,22 @@ class Renderer:
                     self._addstr(
                         rowidx + y, (colidx + x) * 2, "██", block.color
                     )
+
+
+def create_screens(outer_screen: Window) -> Tuple[Optional[Window], Optional[Window]]:
+    if UserInterface.ensure_terminal_size():
+        border_screen = outer_screen.subwin(
+            1 + SCREEN_HEIGHT + 1,
+            1 + SCREEN_WIDTH + 1,
+            (curses.LINES - SCREEN_HEIGHT) // 2 - 1,
+            (curses.COLS - SCREEN_WIDTH) // 2 - 1,
+        )
+        inner_screen = border_screen.subwin(
+            SCREEN_HEIGHT,
+            SCREEN_WIDTH,
+            (curses.LINES - SCREEN_HEIGHT) // 2,
+            (curses.COLS - SCREEN_WIDTH) // 2,
+        )
+    else:
+        return None, None
+    return border_screen, inner_screen
