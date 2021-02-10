@@ -1,6 +1,10 @@
 import curses
 import sys
-from typing import List, Optional, Tuple
+from typing import (
+    List,
+    Optional,
+    Tuple
+)
 
 import trio
 

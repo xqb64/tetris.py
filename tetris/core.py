@@ -1,6 +1,17 @@
 import curses
 import random
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    List,
+    Optional
+)
+
+if TYPE_CHECKING:
+    from tetris.user_interface import UserInterface  # pylint: disable=cyclic-import
+else:
+    UserInterface = Any
 
 import trio
 
@@ -11,11 +22,6 @@ from tetris.exceptions import (
     GameOverError,
     OutOfBoundsError
 )
-
-if TYPE_CHECKING:
-    from tetris.user_interface import UserInterface  # pylint: disable=cyclic-import
-else:
-    UserInterface = Any
 
 
 COLORS: Dict[str, int] = {
