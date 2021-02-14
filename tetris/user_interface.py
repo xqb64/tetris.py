@@ -131,9 +131,7 @@ class Renderer:
             for colidx, _ in enumerate(row):
                 if block.shape[rowidx][colidx] != 0:
                     y, x = block.topleft
-                    self._addstr(
-                        rowidx + y, (colidx + x) * 2, "██", block.color
-                    )
+                    self._addstr(rowidx + y, (colidx + x) * 2, "██", block.color)
 
 
 def create_screens(outer_screen: Window) -> Tuple[Optional[Window], Optional[Window]]:
