@@ -1,5 +1,6 @@
 import curses
 import random
+import time
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -8,13 +9,6 @@ from typing import (
     Optional
 )
 
-if TYPE_CHECKING:
-    from tetris.user_interface import UserInterface  # pylint: disable=cyclic-import
-else:
-    UserInterface = Any
-
-import trio
-
 from tetris import Window
 from tetris.blocks import BLOCKS
 from tetris.exceptions import (
@@ -22,6 +16,11 @@ from tetris.exceptions import (
     GameOverError,
     OutOfBoundsError
 )
+
+if TYPE_CHECKING:
+    from tetris.user_interface import UserInterface  # pylint: disable=cyclic-import
+else:
+    UserInterface = Any
 
 
 COLORS: Dict[str, int] = {
@@ -60,7 +59,7 @@ class Game:
                 self.grid.insert(0, [[0, None] for _ in range(GRID_WIDTH)])
                 self.score += GRID_WIDTH
 
-    async def handle_falling(self) -> None:
+    def handle_falling(self) -> None:
         """
         Handles automatic tetromino falling (every 0.5 seconds), as well as
         landing in case the tetromino touches the ground or another tetromino.
@@ -77,7 +76,7 @@ class Game:
                 try:
                     self.block.land()
                 except GameOverError:
-                    await self.user_interface.display_game_over_screen(self)
+                    self.user_interface.game_over_screen(self)
                 else:
                     self.block = self.next_block
                     self.next_block = Block(self.grid)
@@ -94,7 +93,7 @@ class Game:
         self.counter = 0
         self.score = 0
 
-    async def pause(self) -> None:
+    def pause(self) -> None:
         """
         Pauses the gameplay and waits for user input. If the input is key "p",
         it quits waiting and goes back to main game loop.
@@ -103,7 +102,7 @@ class Game:
             try:
                 user_input = self.screen.getch()
             except curses.error:
-                await trio.sleep(0.1)
+                time.sleep(0.1)
                 continue
             if ord("p") == user_input:
                 break

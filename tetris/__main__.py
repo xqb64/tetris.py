@@ -1,3 +1,4 @@
-from tetris.app import sync_main
+import curses
+from tetris.app import main
 
-sync_main()
+curses.wrapper(main)

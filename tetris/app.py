@@ -8,8 +8,6 @@ from typing import (
     Dict
 )
 
-import trio
-
 from tetris import Window
 from tetris.core import Game
 from tetris.exceptions import CollisionError, OutOfBoundsError
@@ -34,12 +32,8 @@ KEY_BINDINGS: Dict[int, Callable[[Block], None]] = {
 }
 
 
-def sync_main() -> None:
+def main(stdscr: Window) -> None:
     locale.setlocale(locale.LC_ALL, "")
-    curses.wrapper(lambda stdscr: trio.run(main, stdscr))
-
-
-async def main(stdscr: Window) -> None:
     stdscr.nodelay(True)
     curses.curs_set(False)
 
@@ -68,7 +62,7 @@ async def main(stdscr: Window) -> None:
         stdscr.refresh()
         inner_screen.refresh()
 
-        await game.handle_falling()
+        game.handle_falling()
         game.clear_rows()
 
         try:

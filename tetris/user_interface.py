@@ -1,12 +1,11 @@
 import curses
 import sys
+import time
 from typing import (
     List,
     Optional,
     Tuple
 )
-
-import trio
 
 from tetris import Window
 from tetris.core import (
@@ -72,7 +71,7 @@ class UserInterface:
                         block.color,
                     )
 
-    async def display_game_over_screen(self, game: Game) -> None:
+    def game_over_screen(self, game: Game) -> None:
         """
         Displays game over screen and waits for user input.
         If the input are keys "q" or "r", it quits or restarts the game, respectively.
@@ -86,7 +85,7 @@ class UserInterface:
             try:
                 user_input = self.screen.getch()
             except curses.error:
-                await trio.sleep(0.1)
+                time.sleep(0.1)
                 continue
             if ord("q") == user_input:
                 sys.exit()
