@@ -2,6 +2,8 @@
 
 Classic tetris game implementation written in Python using curses.
 
+![screenshot](tetris.png)
+
 ## Playing
 
 You will need [poetry](https://github.com/python-poetry/poetry), preferably with these options in config:
