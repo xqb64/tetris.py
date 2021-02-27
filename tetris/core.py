@@ -1,6 +1,6 @@
 import curses
 import random
-import time
+import sys
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -44,10 +44,11 @@ class Game:
         self.screen = screen
         self.user_interface = user_interface
         self.grid = [[[0, None] for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
-        self.block = Block(self.grid)
-        self.next_block = Block(self.grid)
-        self.counter = 0
-        self.score = 0
+        self.block: Block = Block(self.grid)
+        self.next_block: Block = Block(self.grid)
+        self.counter: int = 0
+        self.score: int = 0
+        self.paused: bool = False
 
     def clear_rows(self) -> None:
         """
@@ -76,7 +77,7 @@ class Game:
                 try:
                     self.block.land()
                 except GameOverError:
-                    self.user_interface.game_over_screen(self)
+                    sys.exit()
                 else:
                     self.block = self.next_block
                     self.next_block = Block(self.grid)
@@ -95,17 +96,9 @@ class Game:
 
     def pause(self) -> None:
         """
-        Pauses the gameplay and waits for user input. If the input is key "p",
-        it quits waiting and goes back to main game loop.
+        Pauses or resumes the gameplay.
         """
-        while True:
-            try:
-                user_input = self.screen.getch()
-            except curses.error:
-                time.sleep(0.1)
-                continue
-            if ord("p") == user_input:
-                break
+        self.paused = not self.paused
 
 
 class Block:

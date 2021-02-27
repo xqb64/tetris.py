@@ -62,8 +62,9 @@ def main(stdscr: Window) -> None:
         stdscr.refresh()
         inner_screen.refresh()
 
-        game.handle_falling()
-        game.clear_rows()
+        if not game.paused:
+            game.handle_falling()
+            game.clear_rows()
 
         try:
             user_input = inner_screen.getch()
@@ -75,10 +76,10 @@ def main(stdscr: Window) -> None:
         if user_input == ord("p"):
             game.pause()
 
-        if user_input == ord("q"):
+        elif user_input == ord("q"):
             sys.exit()
 
-        if user_input in KEY_BINDINGS:
+        elif not game.paused and user_input in KEY_BINDINGS:
             try:
                 KEY_BINDINGS[user_input](game.block)
             except (CollisionError, OutOfBoundsError):
