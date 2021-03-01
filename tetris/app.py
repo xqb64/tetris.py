@@ -45,7 +45,7 @@ def main(stdscr: Window) -> None:
     inner_screen.timeout(100)
     inner_screen.keypad(True)
 
-    user_interface = UserInterface(inner_screen)
+    user_interface = UserInterface(stdscr, inner_screen)
     game = Game(inner_screen, user_interface)
 
     while True:
@@ -54,10 +54,10 @@ def main(stdscr: Window) -> None:
 
         border_screen.box(0, 0)
 
-        user_interface.renderer.render_landed_blocks(game.grid)
-        user_interface.renderer.render_current_block(game.block)
-        user_interface.display_next_block(stdscr, game.next_block)
-        user_interface.display_score(stdscr, game.score)
+        user_interface.render_landed_blocks(game.grid)
+        user_interface.render_current_block(game.block)
+        user_interface.render_next_block(game.next_block)
+        user_interface.render_score(game.score)
 
         stdscr.refresh()
         inner_screen.refresh()
