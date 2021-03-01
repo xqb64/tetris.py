@@ -13,7 +13,8 @@ from tetris.core import Game
 from tetris.exceptions import CollisionError, OutOfBoundsError
 from tetris.user_interface import (
     UserInterface,
-    create_screens
+    create_screens,
+    make_color_pairs,
 )
 
 if TYPE_CHECKING:
@@ -41,6 +42,8 @@ def main(stdscr: Window) -> None:
 
     assert border_screen is not None, "minimum screen size required"
     assert inner_screen is not None, "minimum screen size required"
+
+    make_color_pairs()
 
     inner_screen.timeout(100)
     inner_screen.keypad(True)

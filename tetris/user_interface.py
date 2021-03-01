@@ -56,7 +56,6 @@ class UserInterface:
     def __init__(self, stdscr: Window, inner_screen: Window):
         self.stdscr = stdscr
         self.inner_screen = inner_screen
-        make_color_pairs()
 
     def render_score(self, score: int) -> None:  # pylint: disable=no-self-use
         """
