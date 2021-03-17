@@ -18,18 +18,20 @@ from tetris.user_interface import (
 )
 
 if TYPE_CHECKING:
-    from tetris.core import Block
+    from tetris.core import Tetromino
 else:
-    Block = Any
+    Tetromino = Any
 
 
-KEY_BINDINGS: Dict[int, Callable[[Block], None]] = {
-    curses.KEY_LEFT: lambda block: block.move_sideways("left"),
-    curses.KEY_RIGHT: lambda block: block.move_sideways("right"),
-    curses.KEY_DOWN: lambda block: block.move_down(),
-    ord("s"): lambda block: block.move_all_the_way_down(),
-    ord("a"): lambda block: block.rotate("left"),
-    ord("d"): lambda block: block.rotate("right"),
+KeyBindings = Dict[int, Callable[[Tetromino], None]]
+
+KEY_BINDINGS: KeyBindings = {
+    curses.KEY_LEFT: lambda tetromino: tetromino.move_sideways("left"),
+    curses.KEY_RIGHT: lambda tetromino: tetromino.move_sideways("right"),
+    curses.KEY_DOWN: lambda tetromino: tetromino.move_down(),
+    ord("s"): lambda tetromino: tetromino.move_all_the_way_down(),
+    ord("a"): lambda tetromino: tetromino.rotate("left"),
+    ord("d"): lambda tetromino: tetromino.rotate("right"),
 }
 
 
@@ -57,9 +59,9 @@ def main(stdscr: Window) -> None:
 
         border_screen.box(0, 0)
 
-        user_interface.render_landed_blocks(game.grid)
-        user_interface.render_current_block(game.block)
-        user_interface.render_next_block(game.next_block)
+        user_interface.render_landed_tetrominos(game.grid)
+        user_interface.render_current_tetromino(game.tetromino)
+        user_interface.render_next_tetromino(game.next_tetromino)
         user_interface.render_score(game.score)
 
         stdscr.refresh()
@@ -84,6 +86,6 @@ def main(stdscr: Window) -> None:
 
         elif not game.paused and user_input in KEY_BINDINGS:
             try:
-                KEY_BINDINGS[user_input](game.block)
+                KEY_BINDINGS[user_input](game.tetromino)
             except (CollisionError, OutOfBoundsError):
                 continue

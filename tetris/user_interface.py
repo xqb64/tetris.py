@@ -10,7 +10,7 @@ from tetris.core import (
     COLORS,
     GRID_HEIGHT,
     GRID_WIDTH,
-    Block,
+    Tetromino,
 )
 
 SCREEN_WIDTH: int = GRID_WIDTH * 2
@@ -65,26 +65,26 @@ class UserInterface:
         x = (curses.COLS - SCREEN_WIDTH) // 2 - 1
         self.stdscr.addstr(y, x, f" SCORE: {score} ", curses.A_BOLD)
 
-    def render_next_block(self, block: Block) -> None:  # pylint: disable=no-self-use
+    def render_next_tetromino(self, tetromino: Tetromino) -> None:  # pylint: disable=no-self-use
         """
-        Renders incoming block at the right-hand side of the play field.
+        Renders incoming tetromino at the right-hand side of the play field.
         """
         y = (curses.LINES - SCREEN_HEIGHT) // 2
         x = (curses.COLS - SCREEN_WIDTH) // 2
 
         self.stdscr.addstr(y, x + SCREEN_WIDTH + 3, "NEXT", curses.A_BOLD)
 
-        for rowidx, row in enumerate(block.shape):
+        for rowidx, row in enumerate(tetromino.shape):
             for colidx, _ in enumerate(row):
-                if block.shape[rowidx][colidx] != 0:
+                if tetromino.shape[rowidx][colidx] != 0:
                     self.stdscr.addstr(
                         rowidx + y + 2,
                         (colidx * 2) + x + SCREEN_WIDTH + 3,
                         "██",
-                        block.color,
+                        tetromino.color,
                     )
 
-    def render_landed_blocks(self, grid: List[List[List[Optional[int]]]]) -> None:
+    def render_landed_tetrominos(self, grid: List[List[List[Optional[int]]]]) -> None:
         """
         Renders all the landed tetrominos.
         """
@@ -94,15 +94,15 @@ class UserInterface:
                     assert col[1] is not None
                     self._addstr(rowidx, colidx * 2, "██", col[1])
 
-    def render_current_block(self, block: Block) -> None:
+    def render_current_tetromino(self, tetromino: Tetromino) -> None:
         """
         Renders a current tetromino.
         """
-        for rowidx, row in enumerate(block.shape):
+        for rowidx, row in enumerate(tetromino.shape):
             for colidx, _ in enumerate(row):
-                if block.shape[rowidx][colidx] != 0:
-                    y, x = block.topleft
-                    self._addstr(rowidx + y, (colidx + x) * 2, "██", block.color)
+                if tetromino.shape[rowidx][colidx] != 0:
+                    y, x = tetromino.topleft
+                    self._addstr(rowidx + y, (colidx + x) * 2, "██", tetromino.color)
 
     def _addstr(self, y: int, x: int, text: str, color_info_stuff: int) -> None:
         """
