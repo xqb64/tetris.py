@@ -11,6 +11,7 @@ from tetris.core import (
     GRID_HEIGHT,
     GRID_WIDTH,
     Tetromino,
+    to_4x4,
 )
 
 SCREEN_WIDTH: int = GRID_WIDTH * 2
@@ -74,9 +75,9 @@ class UserInterface:
 
         self.stdscr.addstr(y, x + SCREEN_WIDTH + 3, "NEXT", curses.A_BOLD)
 
-        for rowidx, row in enumerate(tetromino.shape):
-            for colidx, _ in enumerate(row):
-                if tetromino.shape[rowidx][colidx] != 0:
+        for rowidx, row in enumerate(to_4x4(tetromino.shape)):
+            for colidx, block in enumerate(row):
+                if block != 0:
                     self.stdscr.addstr(
                         rowidx + y + 2,
                         (colidx * 2) + x + SCREEN_WIDTH + 3,
@@ -89,18 +90,18 @@ class UserInterface:
         Renders all the landed tetrominos.
         """
         for rowidx, row in enumerate(grid):
-            for colidx, col in enumerate(row):
-                if grid[rowidx][colidx][0] != 0:
-                    assert col[1] is not None
-                    self._addstr(rowidx, colidx * 2, "██", col[1])
+            for colidx, block in enumerate(row):
+                if block[0] != 0:
+                    assert block[1] is not None
+                    self._addstr(rowidx, colidx * 2, "██", block[1])
 
     def render_current_tetromino(self, tetromino: Tetromino) -> None:
         """
         Renders a current tetromino.
         """
-        for rowidx, row in enumerate(tetromino.shape):
-            for colidx, _ in enumerate(row):
-                if tetromino.shape[rowidx][colidx] != 0:
+        for rowidx, row in enumerate(to_4x4(tetromino.shape)):
+            for colidx, block in enumerate(row):
+                if block != 0:
                     y, x = tetromino.topleft
                     self._addstr(rowidx + y, (colidx + x) * 2, "██", tetromino.color)
 

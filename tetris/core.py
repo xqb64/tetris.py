@@ -119,7 +119,7 @@ class Tetromino:
     def __init__(self, grid: Grid):
         self.grid = grid
         self.letter = random.choice(list(BLOCKS.keys()))
-        self.shape = _to_vec(random.choice(BLOCKS[self.letter]))
+        self.shape = random.choice(BLOCKS[self.letter])
         self.topleft = [0, GRID_WIDTH // 2 - 1]
         self.color = curses.color_pair(COLORS[self.letter])
 
@@ -131,11 +131,11 @@ class Tetromino:
         if self.topleft[0] <= 0:
             raise GameOverError
 
-        for rowidx, row in enumerate(self.shape):
+        for rowidx, row in enumerate(to_4x4(self.shape)):
             for colidx, block in enumerate(row):
                 if block != 0:
                     y, x = self.topleft
-                    self.grid[rowidx + y][colidx + x][0] = self.shape[rowidx][colidx]
+                    self.grid[rowidx + y][colidx + x][0] = block
                     self.grid[rowidx + y][colidx + x][1] = self.color
 
     def move_sideways(self, direction: str) -> None:
@@ -143,7 +143,7 @@ class Tetromino:
         Moves a tetromino one step left or right if another tetromino is not in
         its way, whilst making sure it does not go out of bounds at the same time.
         """
-        for rowidx, row in enumerate(self.shape):
+        for rowidx, row in enumerate(to_4x4(self.shape)):
             for colidx, block in enumerate(row):
                 if block != 0:
                     y, x = self.topleft
@@ -159,7 +159,7 @@ class Tetromino:
         Moves a tetromino one step down if another tetromino is not in its way,
         whilst making sure it does not go out of bounds at the same time.
         """
-        for rowidx, row in enumerate(self.shape):
+        for rowidx, row in enumerate(to_4x4(self.shape)):
             for colidx, block in enumerate(row):
                 if block != 0:
                     y, x = self.topleft
@@ -186,12 +186,12 @@ class Tetromino:
         Rotates a tetromino either left or right if another tetromino is
         not in its way, whilst making sure it does not go out of bounds.
         """
-        current_rotation = BLOCKS[self.letter].index(_out_of_vec(self.shape))
+        current_rotation = BLOCKS[self.letter].index(self.shape)
         next_rotation = current_rotation + DIRECTIONS[direction]
 
-        potential_shape = _to_vec(BLOCKS[self.letter][next_rotation % len(BLOCKS[self.letter])])
+        potential_shape = BLOCKS[self.letter][next_rotation % len(BLOCKS[self.letter])]
 
-        for rowidx, row in enumerate(potential_shape):
+        for rowidx, row in enumerate(to_4x4(potential_shape)):
             for colidx, block in enumerate(row):
                 if block != 0:
                     y, x = self.topleft
@@ -205,14 +205,6 @@ class Tetromino:
         self.shape = potential_shape
 
 
-def _to_vec(rotation: int) -> ShapeVec:
+def to_4x4(rotation: int) -> ShapeVec:
     tmp = [(rotation >> 15 - i) & 1 for i in range(16)]
     return list(more_itertools.sliced(tmp, 4))
-
-def _out_of_vec(vec: ShapeVec) -> int:
-    tmp = 0
-    # since we're bring in more_itertools already
-    for block in more_itertools.flatten(vec):
-        tmp <<= 1
-        tmp |= block
-    return tmp
