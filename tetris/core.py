@@ -25,7 +25,7 @@ else:
     UserInterface = Any
 
 
-BLOCKS: Dict[str, List[int]] = {
+SHAPES: Dict[str, List[int]] = {
     "O": [51],
     "I": [8738, 240],
     "S": [54, 561],
@@ -118,8 +118,8 @@ class Game:
 class Tetromino:
     def __init__(self, grid: Grid):
         self.grid = grid
-        self.letter = random.choice(list(BLOCKS.keys()))
-        self.shape = random.choice(BLOCKS[self.letter])
+        self.letter = random.choice(list(SHAPES.keys()))
+        self.shape = random.choice(SHAPES[self.letter])
         self.topleft = [0, GRID_WIDTH // 2 - 1]
         self.color = curses.color_pair(COLORS[self.letter])
 
@@ -186,10 +186,10 @@ class Tetromino:
         Rotates a tetromino either left or right if another tetromino is
         not in its way, whilst making sure it does not go out of bounds.
         """
-        current_rotation = BLOCKS[self.letter].index(self.shape)
+        current_rotation = SHAPES[self.letter].index(self.shape)
         next_rotation = current_rotation + DIRECTIONS[direction]
 
-        potential_shape = BLOCKS[self.letter][next_rotation % len(BLOCKS[self.letter])]
+        potential_shape = SHAPES[self.letter][next_rotation % len(SHAPES[self.letter])]
 
         for rowidx, row in enumerate(to_4x4(potential_shape)):
             for colidx, block in enumerate(row):
