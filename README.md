@@ -2,7 +2,7 @@
 
 Classic tetris game implementation written in Python using curses.
 
-![screenshot](tetris.png)
+![screencast](tetris.gif)
 
 ## Playing
 

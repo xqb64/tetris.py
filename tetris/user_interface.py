@@ -73,14 +73,14 @@ class UserInterface:
         y = (curses.LINES - SCREEN_HEIGHT) // 2
         x = (curses.COLS - SCREEN_WIDTH) // 2
 
-        self.stdscr.addstr(y, x + SCREEN_WIDTH + 3, "NEXT", curses.A_BOLD)
+        self.stdscr.addstr(y, x + SCREEN_WIDTH + 6, "NEXT", curses.A_BOLD)
 
         for rowidx, row in enumerate(to_4x4(tetromino.shape)):
             for colidx, block in enumerate(row):
                 if block != 0:
                     self.stdscr.addstr(
                         rowidx + y + 2,
-                        (colidx * 2) + x + SCREEN_WIDTH + 3,
+                        (colidx * 2) + x + SCREEN_WIDTH + 2,
                         "██",
                         tetromino.color,
                     )
