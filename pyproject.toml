@@ -2,7 +2,7 @@
 name = "tetris"
 version = "0.1.0"
 description = "Classic tetris game implemented with curses in Python"
-authors = ["xvm32 <xvm32@users.noreply.github.com>"]
+authors = ["xqb64 <x@nuked.one>"]
 license = "MIT"
 
 [tool.poetry.scripts]
